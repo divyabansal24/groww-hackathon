@@ -46,25 +46,25 @@ export function CheckpointHero({
         </div>
 
         {/* Right Column: Compact "Your Checkpoint" Panel */}
-        <div className="lg:col-span-5 bg-slate-900 text-white rounded-lg p-5 flex flex-col justify-between shadow-xs relative overflow-hidden">
+        <div className="lg:col-span-5 bg-white border border-gray-200 text-gray-900 rounded-lg p-5 flex flex-col justify-between shadow-2xs relative overflow-hidden">
           
           {/* Panel Header */}
-          <div className="flex items-start justify-between border-b border-slate-800 pb-2.5">
+          <div className="flex items-start justify-between border-b border-gray-100 pb-2.5">
             <div>
-              <span className="text-3xs font-medium text-emerald-400">
+              <span className="text-3xs font-medium text-[#059669]">
                 Your checkpoint
               </span>
-              <h2 className="text-sm font-bold text-white mt-0.5">
+              <h2 className="text-sm font-bold text-gray-900 mt-0.5">
                 {hasBaseline ? 'Your last check' : 'No checkpoint yet'}
               </h2>
             </div>
             
             <div className="text-right">
-              <span className={`text-xs font-semibold block ${hasBaseline ? 'text-slate-400' : 'text-[#059669]'}`}>
+              <span className={`text-xs font-semibold block ${hasBaseline ? 'text-gray-500' : 'text-[#059669]'}`}>
                 {hasBaseline ? formatTimestamp(lastCheckedAt) : 'Pending'}
               </span>
               {hasBaseline && (
-                <span className="text-3xs text-emerald-400 font-medium">
+                <span className="text-3xs text-[#059669] font-medium">
                   {formatRelativeTime(lastCheckedAt)}
                 </span>
               )}
@@ -74,13 +74,13 @@ export function CheckpointHero({
           {/* Panel Body */}
           {hasBaseline ? (
             <div className="my-3 space-y-2">
-              <div className="flex items-center justify-between text-xs text-slate-300">
+              <div className="flex items-center justify-between text-xs text-gray-600">
                 <span>Since then:</span>
-                <span className="font-semibold text-white">
+                <span className="font-semibold text-gray-900">
                   {attentionCount > 0 ? (
-                    <span className="text-amber-400 font-bold">{attentionCount} {attentionCount === 1 ? 'stock needs' : 'stocks need'} attention</span>
+                    <span className="text-amber-600 font-bold">{attentionCount} {attentionCount === 1 ? 'stock needs' : 'stocks need'} attention</span>
                   ) : (
-                    <span className="text-emerald-400 font-medium">No major alerts</span>
+                    <span className="text-[#059669] font-medium">No major alerts</span>
                   )}
                 </span>
               </div>
@@ -92,10 +92,10 @@ export function CheckpointHero({
                     return (
                       <div
                         key={symbol}
-                        className="bg-slate-800/80 border border-slate-700/60 rounded px-2.5 py-1 flex items-center justify-between text-xs"
+                        className="bg-slate-50 border border-slate-200/80 rounded px-2.5 py-1 flex items-center justify-between text-xs"
                       >
-                        <span className="font-bold text-slate-200">{symbol}</span>
-                        <span className={`font-mono font-bold ${isUp ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        <span className="font-bold text-gray-900">{symbol}</span>
+                        <span className={`font-mono font-bold ${isUp ? 'text-emerald-700' : 'text-rose-600'}`}>
                           {isUp ? '+' : ''}{formatPercent(delta.deltaPercent, false)}
                         </span>
                       </div>
@@ -103,29 +103,29 @@ export function CheckpointHero({
                   })}
                 </div>
               ) : (
-                <p className="text-xs text-slate-400 italic">No price deltas calculated yet.</p>
+                <p className="text-xs text-gray-500 italic">No price deltas calculated yet.</p>
               )}
             </div>
           ) : (
-            <div className="my-3 text-xs text-slate-300 space-y-1.5">
+            <div className="my-3 text-xs text-gray-600 space-y-1.5">
               <div className="flex items-center gap-2 text-[#059669]">
                 <AlertCircle className="w-4 h-4 shrink-0 text-[#059669]" />
-                <span className="font-medium text-[#059669]">Baseline required for tracking</span>
+                <span className="font-semibold text-[#059669]">Baseline required for tracking</span>
               </div>
-              <p className="text-slate-400 text-3xs leading-relaxed">
+              <p className="text-gray-500 text-3xs leading-relaxed">
                 Click "Mark as checked" to record current live prices as your starting baseline.
               </p>
             </div>
           )}
 
           {/* Panel Footer Action */}
-          <div className="pt-2.5 border-t border-slate-800 flex items-center justify-between">
-            <span className="text-3xs text-slate-400">
+          <div className="pt-2.5 border-t border-gray-100 flex items-center justify-between">
+            <span className="text-3xs text-gray-500">
               {hasBaseline ? 'Checkpoint active' : 'Set baseline'}
             </span>
             <button
               onClick={onMarkAsChecked}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors cursor-pointer"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-2.5 py-1 rounded transition-colors cursor-pointer"
             >
               {hasBaseline ? 'Update checkpoint' : 'Mark as checked'}
             </button>

@@ -25,19 +25,16 @@ export function Header({
           
           {/* Brand Logo & Tagline */}
           <div className="flex items-center gap-3">
-            <svg className="w-8 h-8 shrink-0 shadow-xs" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="32" height="32" rx="8" fill="#059669" />
-              <text
-                x="16"
-                y="21.5"
-                textAnchor="middle"
-                fill="#FFFFFF"
-                fontSize="18"
-                fontWeight="800"
-                fontFamily="system-ui, -apple-system, sans-serif"
-              >
-                G
-              </text>
+            <svg className="w-9 h-9 shrink-0 shadow-2xs rounded-full overflow-hidden" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g clipPath="url(#growwLogoClip)">
+                <rect width="36" height="36" fill="#5367FF" />
+                <path d="M -2 18 C 8 24, 26 12, 38 18 L 38 38 L -2 38 Z" fill="#00D09C" />
+              </g>
+              <defs>
+                <clipPath id="growwLogoClip">
+                  <circle cx="18" cy="18" r="18" />
+                </clipPath>
+              </defs>
             </svg>
             <div>
               <div className="flex items-center gap-2">
