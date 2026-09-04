@@ -1,4 +1,11 @@
 .env
+*.env
 node_modules
+dist
+venv
+.venv
+ENV
 __pycache__
 *.pyc
+*.zip
+.DS_Store
