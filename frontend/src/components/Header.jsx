@@ -25,9 +25,20 @@ export function Header({
           
           {/* Brand Logo & Tagline */}
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-xs">
-              W
-            </div>
+            <svg className="w-8 h-8 shrink-0 shadow-xs" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="32" height="32" rx="8" fill="#059669" />
+              <text
+                x="16"
+                y="21.5"
+                textAnchor="middle"
+                fill="#FFFFFF"
+                fontSize="18"
+                fontWeight="800"
+                fontFamily="system-ui, -apple-system, sans-serif"
+              >
+                G
+              </text>
+            </svg>
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-base font-bold text-slate-900 tracking-tight">

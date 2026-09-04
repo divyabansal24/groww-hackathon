@@ -60,7 +60,7 @@ export function CheckpointHero({
             </div>
             
             <div className="text-right">
-              <span className="text-xs font-semibold text-slate-400 block">
+              <span className={`text-xs font-semibold block ${hasBaseline ? 'text-slate-400' : 'text-[#059669]'}`}>
                 {hasBaseline ? formatTimestamp(lastCheckedAt) : 'Pending'}
               </span>
               {hasBaseline && (
@@ -108,9 +108,9 @@ export function CheckpointHero({
             </div>
           ) : (
             <div className="my-3 text-xs text-slate-300 space-y-1.5">
-              <div className="flex items-center gap-2 text-amber-400">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span className="font-medium">Baseline required for tracking</span>
+              <div className="flex items-center gap-2 text-[#059669]">
+                <AlertCircle className="w-4 h-4 shrink-0 text-[#059669]" />
+                <span className="font-medium text-[#059669]">Baseline required for tracking</span>
               </div>
               <p className="text-slate-400 text-3xs leading-relaxed">
                 Click "Mark as checked" to record current live prices as your starting baseline.
