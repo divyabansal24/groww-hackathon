@@ -5,7 +5,8 @@ const DEFAULT_WATCHLIST = ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'TATAPOWER'];
 const DEFAULT_STATE = {
   watchlist: DEFAULT_WATCHLIST,
   lastCheckedAt: null,
-  snapshot: {}
+  snapshot: {},
+  history: []
 };
 
 /**
@@ -30,12 +31,14 @@ export function loadState() {
       ? parsed.snapshot
       : {};
 
+    const history = Array.isArray(parsed.history) ? parsed.history : [];
     const lastCheckedAt = parsed.lastCheckedAt || null;
 
     return {
       watchlist,
       lastCheckedAt,
-      snapshot
+      snapshot,
+      history
     };
   } catch (err) {
     console.warn('Failed to parse watchlist state from localStorage:', err);
@@ -51,7 +54,8 @@ export function saveState(state) {
     const stateToSave = {
       watchlist: Array.isArray(state?.watchlist) ? state.watchlist : [...DEFAULT_WATCHLIST],
       lastCheckedAt: state?.lastCheckedAt || null,
-      snapshot: state?.snapshot || {}
+      snapshot: state?.snapshot || {},
+      history: Array.isArray(state?.history) ? state.history : []
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
     return true;
@@ -122,7 +126,7 @@ export function removeSymbol(symbol) {
 }
 
 /**
- * Snapshot current quote prices and update lastCheckedAt timestamp to NOW.
+ * Snapshot current quote prices, record checkpoint history entry, and update lastCheckedAt timestamp to NOW.
  */
 export function markAllAsChecked(currentQuotes = {}) {
   const currentState = loadState();
@@ -140,10 +144,20 @@ export function markAllAsChecked(currentQuotes = {}) {
     }
   });
 
+  const historyEntry = {
+    timestamp: nowISO,
+    stockCount: currentState.watchlist.length,
+    snapshot: newSnapshot
+  };
+
+  const existingHistory = Array.isArray(currentState.history) ? currentState.history : [];
+  const updatedHistory = [historyEntry, ...existingHistory].slice(0, 5);
+
   const updatedState = {
     ...currentState,
     lastCheckedAt: nowISO,
-    snapshot: newSnapshot
+    snapshot: newSnapshot,
+    history: updatedHistory
   };
   saveState(updatedState);
   return updatedState;

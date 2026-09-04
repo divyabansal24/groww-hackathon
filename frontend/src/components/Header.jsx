@@ -4,62 +4,82 @@ import { formatRelativeTime } from '../utils/formatters';
 
 export function Header({
   lastCheckedAt,
+  lastUpdatedSeconds,
   isMarketOpen,
   isRefreshing,
   onMarkAsChecked,
   onRefresh
 }) {
+  const getUpdatedText = () => {
+    if (lastUpdatedSeconds === null || lastUpdatedSeconds === undefined) return 'Updating...';
+    if (lastUpdatedSeconds < 5) return 'Updated: Just now';
+    if (lastUpdatedSeconds < 60) return `Updated: ${lastUpdatedSeconds}s ago`;
+    const mins = Math.floor(lastUpdatedSeconds / 60);
+    return `Updated: ${mins}m ago`;
+  };
+
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-2xs">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
           
-          {/* Brand & Identity */}
-          <div>
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-md bg-emerald-600 flex items-center justify-center text-white font-bold text-sm">
-                W
+          {/* Brand Logo & Tagline */}
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-xs">
+              W
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-base font-bold text-slate-900 tracking-tight">
+                  SMART WATCHLIST
+                </span>
+                <span className="hidden sm:inline-block text-3xs font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">
+                  NSE
+                </span>
               </div>
-              <h1 className="text-lg font-bold text-slate-900 tracking-tight">
-                SMART WATCHLIST
-              </h1>
-              <span className="text-xs text-slate-400 font-normal border-l border-slate-200 pl-2 ml-0.5">
+              <p className="text-xs text-slate-500 font-medium">
                 Know what changed.
-              </span>
+              </p>
             </div>
           </div>
 
-          {/* Controls & Status Indicators */}
-          <div className="flex flex-wrap items-center gap-2.5">
+          {/* Controls & Market Status */}
+          <div className="flex items-center gap-2.5">
             
-            {/* Market Status */}
-            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md text-xs font-medium text-slate-600">
-              <span className={`w-2 h-2 rounded-full ${isMarketOpen ? 'bg-emerald-500' : 'bg-slate-400'}`} />
+            {/* Live Auto-Refresh Indicator */}
+            <div className="hidden lg:flex items-center gap-1.5 text-xs text-slate-500 font-medium bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+              <span>{getUpdatedText()}</span>
+            </div>
+
+            {/* Market Status Indicator */}
+            <div className="hidden sm:flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md text-xs font-medium text-slate-600">
+              <span className={`w-2 h-2 rounded-full ${isMarketOpen ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
               <span>{isMarketOpen ? 'Market Open' : 'Market Closed'}</span>
             </div>
 
-            {/* Baseline Timestamp */}
-            <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md text-xs text-slate-600 font-medium">
+            {/* Baseline Timestamp Pill */}
+            <div className="hidden md:flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md text-xs text-slate-600 font-medium">
               <Clock className="w-3.5 h-3.5 text-slate-400" />
-              <span>Baseline: {formatRelativeTime(lastCheckedAt)}</span>
+              <span>{lastCheckedAt ? `Baseline: ${formatRelativeTime(lastCheckedAt)}` : 'No Checkpoint Yet'}</span>
             </div>
 
-            {/* Refresh Quote Action */}
+            {/* Refresh Live Quotes */}
             <button
               onClick={onRefresh}
               disabled={isRefreshing}
-              title="Refresh live prices"
+              title="Refresh market quotes manually"
               className="p-1.5 border border-slate-200 rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-50 transition-colors disabled:opacity-50 cursor-pointer"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-emerald-600' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-emerald-600' : ''}`} />
             </button>
 
-            {/* Primary Action: Mark as Checked */}
+            {/* Primary Checkpoint Action */}
             <button
               onClick={onMarkAsChecked}
-              className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-md transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3.5 py-2 rounded-md shadow-2xs transition-colors cursor-pointer"
             >
-              <CheckCircle2 className="w-3.5 h-3.5" />
+              <CheckCircle2 className="w-4 h-4" />
               <span>Mark as checked</span>
             </button>
 

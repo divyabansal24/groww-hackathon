@@ -60,13 +60,13 @@ export function StockDetailDrawer({ stockItem, lastCheckedAt, onClose, onRemoveS
     const isUp = delta.deltaPercent >= 0;
 
     if (delta.attentionLevel === 'MAJOR_MOVE') {
-      return `${symbol} is ${isUp ? 'up' : 'down'} ${absPct}% since your last check. This exceeds your 2.0% attention threshold.`;
+      return `${symbol} is ${isUp ? 'up' : 'down'} ${absPct}% since your last check, crossing the 2.0% Major Move threshold.`;
     }
     if (delta.attentionLevel === 'MODERATE_GAIN') {
-      return `${symbol} is up ${absPct}% since your last check. This represents a moderate upward price movement.`;
+      return `${symbol} is up ${absPct}% since your last check, matching the Moderate Gain threshold.`;
     }
     if (delta.attentionLevel === 'MODERATE_DIP') {
-      return `${symbol} is down ${absPct}% since your last check. This represents a moderate price dip.`;
+      return `${symbol} is down ${absPct}% since your last check, matching the Moderate Dip threshold.`;
     }
     return `${symbol} has moved only ${absPct}% since your last check, so there is no significant change requiring immediate attention.`;
   };
@@ -74,63 +74,59 @@ export function StockDetailDrawer({ stockItem, lastCheckedAt, onClose, onRemoveS
   const strokeColor = isPositive ? '#059669' : '#e11d48';
 
   return (
-    <div className="fixed inset-0 z-40 overflow-hidden">
+    <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Semi-transparent overlay backdrop */}
       <div
-        className="fixed inset-0 bg-slate-900/30 transition-opacity"
+        className="fixed inset-0 bg-slate-900/40 transition-opacity"
         onClick={onClose}
       />
 
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-white border-l border-slate-200 shadow-xl flex flex-col justify-between overflow-y-auto">
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
+        <div className="w-screen max-w-md bg-white border-l border-slate-200 shadow-2xl flex flex-col justify-between overflow-y-auto">
           
-          {/* Main Drawer Body */}
+          {/* Drawer Header */}
           <div className="p-5 space-y-5">
-            
-            {/* 1. Symbol & Company Name Header */}
             <div className="flex items-start justify-between gap-4 pb-3 border-b border-slate-100">
               <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-bold text-slate-900">{symbol}</h2>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600">
+                <p className="font-bold text-slate-900 text-lg">{name}</p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-xs font-bold text-slate-600">{symbol}</span>
+                  <span className="text-3xs font-semibold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-slate-500">
                     NSE
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">{name}</p>
               </div>
 
               <button
                 onClick={onClose}
-                className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* 2 & 3 & 4. Current Price, Today's Change, and Change Since Last Check */}
+            {/* Price Snapshot Cards */}
             <div className="grid grid-cols-2 gap-3">
-              {/* Current Price & Today's Move */}
               <div className="bg-slate-50 border border-slate-200 rounded-lg p-3.5">
                 <p className="text-3xs font-semibold uppercase text-slate-400 tracking-wider">
                   Live Price
                 </p>
-                <p className="text-lg font-bold text-slate-900 mt-1">
+                <p className="text-lg font-bold font-mono text-slate-900 mt-1">
                   {isStale ? '—' : formatINR(quote.price)}
                 </p>
                 {!isStale && (
-                  <span className={`inline-flex items-center gap-0.5 text-xs font-medium mt-0.5 ${isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  <span className={`inline-flex items-center gap-0.5 text-xs font-semibold mt-0.5 ${isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
                     {isPositive ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
                     {formatPercent(quote.changePercent)} today
                   </span>
                 )}
               </div>
 
-              {/* Change Since Last Check */}
               <div className="bg-emerald-50/50 border border-emerald-200/80 rounded-lg p-3.5">
                 <p className="text-3xs font-semibold uppercase text-emerald-900 tracking-wider">
                   Since Last Check
                 </p>
-                <p className={`text-lg font-bold mt-1 ${deltaIsPositive ? 'text-emerald-800' : 'text-rose-800'}`}>
+                <p className={`text-lg font-bold font-mono mt-1 ${deltaIsPositive ? 'text-emerald-800' : 'text-rose-800'}`}>
                   {delta.deltaPercent !== null ? formatPercent(delta.deltaPercent) : '—'}
                 </p>
                 <p className="text-3xs text-slate-500 mt-0.5 font-medium truncate">
@@ -139,10 +135,10 @@ export function StockDetailDrawer({ stockItem, lastCheckedAt, onClose, onRemoveS
               </div>
             </div>
 
-            {/* 6. Recent Price History (Recharts) */}
+            {/* 1D / 5D / 1M Chart */}
             <div className="bg-white border border-slate-200 rounded-lg p-3.5 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-900">Price Performance</span>
+                <span className="text-xs font-bold text-slate-900">Recent Price History</span>
                 
                 <div className="inline-flex rounded-md bg-slate-100 p-0.5 text-xs font-medium">
                   {['1d', '5d', '1m'].map((p) => (
@@ -165,7 +161,7 @@ export function StockDetailDrawer({ stockItem, lastCheckedAt, onClose, onRemoveS
                 {isLoadingHistory ? (
                   <div className="h-full flex items-center justify-center text-slate-400 text-xs gap-2">
                     <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
-                    <span>Loading price history...</span>
+                    <span>Loading chart...</span>
                   </div>
                 ) : historyData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
@@ -188,35 +184,35 @@ export function StockDetailDrawer({ stockItem, lastCheckedAt, onClose, onRemoveS
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center text-slate-400 text-xs">
-                    Historical data unavailable
+                    Historical chart unavailable for this period
                   </div>
                 )}
               </div>
             </div>
 
-            {/* 5. "Why am I seeing this?" Section */}
+            {/* WHY THIS STOCK IS FLAGGED Section */}
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-2.5">
-              <div className="flex items-center gap-2 text-slate-900 font-bold text-xs">
+              <div className="flex items-center gap-2 text-slate-900 font-bold text-xs uppercase tracking-wider">
                 <HelpCircle className="w-4 h-4 text-emerald-600" />
-                <span>Why am I seeing this?</span>
+                <span>Why This Stock Is Flagged</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 font-medium">Status:</span>
+                <span className="text-xs text-slate-500 font-medium">Watchlist Status:</span>
                 <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full border ${attentionConfig.badgeClass}`}>
                   <span>{attentionConfig.icon}</span>
                   <span>{attentionConfig.label}</span>
                 </span>
               </div>
 
-              <p className="text-xs text-slate-700 leading-relaxed font-normal bg-white p-3 rounded-md border border-slate-200">
+              <p className="text-xs text-slate-800 leading-relaxed font-medium bg-white p-3 rounded-md border border-slate-200">
                 {getDetailedExplanation()}
               </p>
 
               <div className="flex items-start gap-1.5 text-3xs text-slate-500 pt-0.5">
                 <Info className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
                 <span>
-                  This flag refers strictly to our Watchlist attention rules (baseline: {formatRelativeTime(lastCheckedAt)}), not external real-world market news.
+                  This flag refers strictly to our Watchlist attention rules (baseline: {formatRelativeTime(lastCheckedAt)}), independently of real-world market news.
                 </span>
               </div>
             </div>

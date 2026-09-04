@@ -74,3 +74,23 @@ export function formatRelativeTime(isoString) {
     return 'Never checked';
   }
 }
+
+/**
+ * Format checkpoint date/time (e.g. Sep 4, 11:23 AM)
+ */
+export function formatCheckpointTime(isoString) {
+  if (!isoString) return '—';
+  try {
+    const d = new Date(isoString);
+    if (isNaN(d.getTime())) return '—';
+    return d.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  } catch {
+    return '—';
+  }
+}
