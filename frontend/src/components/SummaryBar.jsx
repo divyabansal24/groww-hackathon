@@ -14,8 +14,8 @@ export function SummaryBar({
   return (
     <div className="bg-white border border-slate-200 rounded-lg p-4 mb-5 shadow-2xs">
       
-      <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 mb-3">
+        <h2 className="text-xs font-semibold text-slate-500">
           Since your last check
         </h2>
         <span className="text-3xs font-medium text-slate-400">
@@ -24,7 +24,6 @@ export function SummaryBar({
       </div>
 
       {!hasBaseline ? (
-        /* No Baseline State */
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <div>
             <p className="font-semibold text-slate-900">
@@ -39,14 +38,12 @@ export function SummaryBar({
             className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-md transition-colors cursor-pointer self-start sm:self-auto"
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Set Baseline Now</span>
+            <span>Set baseline now</span>
           </button>
         </div>
       ) : (
-        /* Baseline Exists State */
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
           
-          {/* Item 1: Attention Summary */}
           <div className="flex items-center gap-3">
             <div className={`w-8 h-8 rounded-md flex items-center justify-center ${attentionCount > 0 ? 'bg-amber-50 text-amber-600 border border-amber-200' : 'bg-slate-50 text-slate-400 border border-slate-200'}`}>
               <Bell className="w-4 h-4" />
@@ -61,7 +58,6 @@ export function SummaryBar({
             </div>
           </div>
 
-          {/* Item 2: Top Mover */}
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-md bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500">
               {topMover && topMover.deltaPercent < 0 ? (
@@ -87,7 +83,6 @@ export function SummaryBar({
             </div>
           </div>
 
-          {/* Item 3: Watchlist Size */}
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-md bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-500">
               <Layers className="w-4 h-4" />

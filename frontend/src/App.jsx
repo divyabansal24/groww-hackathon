@@ -9,7 +9,7 @@ import { EmptyState } from './components/EmptyState';
 import { ErrorBanner } from './components/ErrorBanner';
 import { loadState, addSymbol, removeSymbol, markAllAsChecked } from './utils/storage';
 import { analyzeWatchlistDeltas } from './utils/deltaEngine';
-import { fetchHealth, fetchQuotes } from './services/api';
+import { pingHealth, fetchHealth, fetchQuotes } from './services/api';
 import { CheckCircle2, X } from 'lucide-react';
 import './App.css';
 
@@ -18,6 +18,7 @@ export default function App() {
   const [quotes, setQuotes] = useState({});
   const [isMarketOpen, setIsMarketOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isWakingUp, setIsWakingUp] = useState(true);
   const [isError, setIsError] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [selectedSymbol, setSelectedSymbol] = useState(null);
@@ -44,7 +45,7 @@ export default function App() {
     return () => clearInterval(interval);
   }, [lastUpdatedTime]);
 
-  // Manual / Initial Load Data fetch
+  // Manual / Explicit Data fetch
   const loadData = useCallback(async (showSpinner = true) => {
     if (showSpinner) setIsRefreshing(true);
     const currentStorage = loadState();
@@ -70,6 +71,65 @@ export default function App() {
     if (showSpinner) setIsRefreshing(false);
   }, []);
 
+  // Backend Cold Start 3-second ping loop on initial mount
+  useEffect(() => {
+    let ignore = false;
+    let pollInterval = null;
+
+    async function checkBackendAndInit() {
+      setIsRefreshing(true);
+      const currentStorage = loadState();
+      if (!ignore) setStorageState(currentStorage);
+
+      // Fast initial ping
+      const health = await pingHealth();
+      if (health && health.status === 'ok') {
+        if (!ignore) {
+          setIsWakingUp(false);
+          setIsMarketOpen(Boolean(health.market_open));
+          const qData = await fetchQuotes(currentStorage.watchlist);
+          if (qData !== null) {
+            setQuotes(qData);
+            setLastUpdatedTime(new Date().toISOString());
+            setLastUpdatedSeconds(0);
+            setIsError(false);
+          }
+          setIsRefreshing(false);
+        }
+        return;
+      }
+
+      // Cold start detected: Show waking up banner and ping every 3s
+      if (!ignore) setIsWakingUp(true);
+
+      pollInterval = setInterval(async () => {
+        const pingRes = await pingHealth();
+        if (pingRes && pingRes.status === 'ok') {
+          if (pollInterval) clearInterval(pollInterval);
+          if (!ignore) {
+            setIsWakingUp(false);
+            setIsMarketOpen(Boolean(pingRes.market_open));
+            const latestStorage = loadState();
+            const qData = await fetchQuotes(latestStorage.watchlist);
+            if (qData !== null) {
+              setQuotes(qData);
+              setLastUpdatedTime(new Date().toISOString());
+              setLastUpdatedSeconds(0);
+              setIsError(false);
+            }
+            setIsRefreshing(false);
+          }
+        }
+      }, 3000);
+    }
+
+    checkBackendAndInit();
+    return () => {
+      ignore = true;
+      if (pollInterval) clearInterval(pollInterval);
+    };
+  }, []);
+
   // Silent Background Auto-Refresh every 60 seconds
   useEffect(() => {
     const autoRefreshInterval = setInterval(async () => {
@@ -87,39 +147,6 @@ export default function App() {
     }, 60000);
 
     return () => clearInterval(autoRefreshInterval);
-  }, []);
-
-  // Initial load on mount
-  useEffect(() => {
-    let ignore = false;
-    async function init() {
-      setIsRefreshing(true);
-      const currentStorage = loadState();
-      if (!ignore) setStorageState(currentStorage);
-
-      const [healthData, quotesData] = await Promise.all([
-        fetchHealth(),
-        fetchQuotes(currentStorage.watchlist)
-      ]);
-
-      if (!ignore) {
-        setIsMarketOpen(Boolean(healthData?.market_open));
-        if (quotesData === null) {
-          setIsError(true);
-        } else {
-          setIsError(false);
-          setQuotes(quotesData);
-          const nowISO = new Date().toISOString();
-          setLastUpdatedTime(nowISO);
-          setLastUpdatedSeconds(0);
-        }
-        setIsRefreshing(false);
-      }
-    }
-    init();
-    return () => {
-      ignore = true;
-    };
   }, []);
 
   // Handler: Mark all as checked (Update baseline & history)
@@ -203,12 +230,20 @@ export default function App() {
       )}
 
       {/* Centered Main Page Container */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 w-full">
         
-        {/* Error Banner if API Offline */}
-        {isError && <ErrorBanner onRetry={() => loadData(true)} />}
+        {/* Backend Waking Up Cold Start Banner */}
+        {isWakingUp && (
+          <div className="bg-emerald-50/90 border border-emerald-200/90 text-emerald-950 rounded-lg p-3.5 mb-5 flex items-center justify-center gap-2.5 text-xs font-semibold shadow-2xs animate-pulse">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+            <span>Waking up market data server, please wait...</span>
+          </div>
+        )}
 
-        {/* 2. MAIN INTRO / CHECKPOINT HERO AREA WITH HISTORY */}
+        {/* Error Banner if API Offline after wake-up attempt */}
+        {!isWakingUp && isError && <ErrorBanner onRetry={() => loadData(true)} />}
+
+        {/* 2. MAIN INTRO / CHECKPOINT HERO AREA */}
         <CheckpointHero
           lastCheckedAt={storageState.lastCheckedAt}
           attentionCount={analysis.attentionCount}
@@ -252,7 +287,7 @@ export default function App() {
       )}
 
       {/* 9. FOOTER */}
-      <footer className="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+      <footer className="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="font-bold text-slate-900">SMART WATCHLIST</span>

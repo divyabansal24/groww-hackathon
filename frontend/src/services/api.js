@@ -9,6 +9,15 @@ const api = axios.create({
   timeout: 12000,
 });
 
+export async function pingHealth() {
+  try {
+    const res = await api.get('/api/health', { timeout: 3500 });
+    return res.status === 200 && res.data ? res.data : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchHealth() {
   try {
     const res = await api.get('/api/health');
