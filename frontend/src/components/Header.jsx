@@ -58,9 +58,9 @@ export function Header({
               <span>{isMarketOpen ? 'Market Open' : 'Market Closed'}</span>
             </div>
 
-            {/* Baseline Timestamp Pill */}
-            <div className="hidden md:flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md text-xs text-slate-600 font-medium">
-              <Clock className="w-3.5 h-3.5 text-slate-400" />
+            {/* Baseline Timestamp Pill - Emerald Green Styling */}
+            <div className="hidden md:flex items-center gap-1.5 bg-emerald-50/70 border border-emerald-200/80 px-2.5 py-1 rounded-md text-xs text-emerald-800 font-medium">
+              <Clock className="w-3.5 h-3.5 text-emerald-600" />
               <span>{lastCheckedAt ? `Baseline: ${formatRelativeTime(lastCheckedAt)}` : 'No Checkpoint Yet'}</span>
             </div>
 
